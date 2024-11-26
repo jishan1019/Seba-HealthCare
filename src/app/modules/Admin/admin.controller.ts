@@ -7,11 +7,27 @@ const getAllAdmin = async (req: Request, res: Response) => {
   const filters = pick(req.query, adminFilterableFields);
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
 
-  const result = AdminService.getAllAdminFromDB(filters, options);
+  const result = await AdminService.getAllAdminFromDB(filters, options);
 
-  return result;
+  res.json(result);
+};
+
+const getSingleAdmin = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = AdminService.getSingleAdminFromDB(id);
+
+  res.json(result);
+};
+
+const updateAdmin = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = AdminService.updateAdminFromDB(id, req.body);
+
+  res.json(result);
 };
 
 export const AdminController = {
   getAllAdmin,
+  getSingleAdmin,
+  updateAdmin,
 };
