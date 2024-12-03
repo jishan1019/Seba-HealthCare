@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { AdminService } from "./admin.service";
 import pick from "../../../shared/pick";
 import { adminFilterableFields } from "./admin.constant";
+import { sendResponse } from "../../../shared/sendResponse";
 
 const getAllAdmin = async (req: Request, res: Response) => {
   const filters = pick(req.query, adminFilterableFields);
@@ -9,35 +10,61 @@ const getAllAdmin = async (req: Request, res: Response) => {
 
   const result = await AdminService.getAllAdminFromDB(filters, options);
 
-  res.json(result);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Admins fetched successfully",
+    meta: result.meta,
+    data: result.data,
+  });
 };
 
 const getSingleAdmin = async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = AdminService.getSingleAdminFromDB(id);
 
-  res.json(result);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Admin is fetched successfully",
+    data: result,
+  });
 };
 
 const updateAdmin = async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = AdminService.updateAdminFromDB(id, req.body);
 
-  res.json(result);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Admin is updated successfully",
+    data: result,
+  });
 };
 
 const deleteAdmin = async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = AdminService.deleteAdminFromDB(id);
 
-  res.json(result);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Admin is deleted successfully",
+    data: result,
+  });
 };
 
 const softAdminDelete = async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = AdminService.softAdminDeleteFromDB(id);
 
-  res.json(result);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Admin is deleted successfully",
+    data: result,
+  });
 };
 
 export const AdminController = {

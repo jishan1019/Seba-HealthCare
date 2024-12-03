@@ -23,6 +23,10 @@ const getAllAdminFromDB = async (
     });
   }
 
+  andCondition.push({
+    isDeleted: false,
+  });
+
   if (Object.keys(filterData).length > 0) {
     andCondition.push({
       AND: Object.keys(filterData).map((key) => ({
@@ -60,10 +64,11 @@ const getAllAdminFromDB = async (
   };
 };
 
-const getSingleAdminFromDB = async (id: string) => {
+const getSingleAdminFromDB = async (id: string): Promise<Admin | null> => {
   const result = await prisma.admin.findUnique({
     where: {
       id,
+      isDeleted: false,
     },
   });
 
@@ -74,6 +79,7 @@ const updateAdminFromDB = async (id: string, payload: Partial<Admin>) => {
   const result = await prisma.admin.update({
     where: {
       id,
+      isDeleted: false,
     },
     data: payload,
   });
@@ -89,6 +95,7 @@ const deleteAdminFromDB = async (id: string) => {
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
+      isDeleted: false,
     },
   });
 
@@ -115,6 +122,7 @@ const softAdminDeleteFromDB = async (id: string) => {
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
+      isDeleted: false,
     },
   });
 
