@@ -26,8 +26,24 @@ const updateAdmin = async (req: Request, res: Response) => {
   res.json(result);
 };
 
+const deleteAdmin = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = AdminService.deleteAdminFromDB(id);
+
+  res.json(result);
+};
+
+const softAdminDelete = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = AdminService.softAdminDeleteFromDB(id);
+
+  res.json(result);
+};
+
 export const AdminController = {
   getAllAdmin,
   getSingleAdmin,
   updateAdmin,
+  deleteAdmin,
+  softAdminDelete,
 };

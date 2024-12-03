@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Admin, Prisma, PrismaClient, UserStatus } from "@prisma/client";
 import { adminSearchableFields } from "./admin.constant";
 import calculatePagination from "../../../helper/paginationHelper";
 import prisma from "../../../helper/prisma";
@@ -70,12 +70,74 @@ const getSingleAdminFromDB = async (id: string) => {
   return result;
 };
 
-const updateAdminFromDB = async (id: string, payload: any) => {
+const updateAdminFromDB = async (id: string, payload: Partial<Admin>) => {
   const result = await prisma.admin.update({
     where: {
       id,
     },
     data: payload,
+  });
+
+  if (!result) {
+    throw new Error("Admin not found");
+  }
+
+  return result;
+};
+
+const deleteAdminFromDB = async (id: string) => {
+  await prisma.admin.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const result = await prisma.$transaction(async (trxClient) => {
+    const adminDeletedData = await trxClient.admin.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    const userDeleteData = await trxClient.user.delete({
+      where: {
+        email: adminDeletedData.email,
+      },
+    });
+
+    return adminDeletedData;
+  });
+
+  return result;
+};
+
+const softAdminDeleteFromDB = async (id: string) => {
+  await prisma.admin.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const result = await prisma.$transaction(async (trxClient) => {
+    const adminDeletedData = await trxClient.admin.update({
+      where: {
+        id: id,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    const userDeleteData = await trxClient.user.update({
+      where: {
+        email: adminDeletedData.email,
+      },
+      data: {
+        status: UserStatus.DELETED,
+      },
+    });
+
+    return adminDeletedData;
   });
 
   return result;
@@ -85,4 +147,6 @@ export const AdminService = {
   getAllAdminFromDB,
   getSingleAdminFromDB,
   updateAdminFromDB,
+  deleteAdminFromDB,
+  softAdminDeleteFromDB,
 };
